@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devocional Diário - PIPQ</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0f2019">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="voltar-flutuante" href="index.html" aria-label="Voltar para o início">
+    <i class="fa-solid fa-arrow-left"></i>
+  </a>
+
+  <div class="page-content">
+    <div class="arch-wrap">
+      <div class="arch">
+        <i class="fa-solid fa-cross logo-icon"></i>
+        <h1>Devocional Diário</h1>
+      </div>
+    </div>
+
+    <div class="page-card">
+      <p>Mensagem diária para edificação espiritual.</p>
+      <span class="em-breve">Conteúdo em breve</span>
+    </div>
+  </div>
+
+
+  <script>
+    // Registra o Service Worker para permitir instalar o app e usar offline
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.warn('Não foi possível registrar o service worker.', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

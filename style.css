@@ -1,0 +1,554 @@
+/* ============================================================
+   ESTILO COMPARTILHADO - PIPQ
+   -------------------------------------------------------------
+   Este arquivo é usado pela página inicial (index.html) e por
+   todas as páginas secundárias (igreja.html, eventos.html, etc).
+   Mudar uma cor aqui muda o site inteiro.
+============================================================ */
+
+:root{
+  --bg-deep:#0f2019;       /* verde-pinho quase preto, cor de fundo geral */
+  --panel:#1b3529;         /* verde dos cartões/itens */
+  --panel-light:#204030;   /* verde um pouco mais claro, para hover */
+  --gold:#cf9f4d;          /* dourado - cor de destaque (a "vela") */
+  --gold-soft:#e8c987;
+  --cream:#f4ecdd;         /* creme - cor do texto claro, imita papel */
+  --muted:#9fb6a8;         /* verde-acinzentado, texto secundário */
+  --radius:18px;
+  --serif:'Cormorant Garamond', Georgia, serif;
+  --sans:'Inter', Arial, Helvetica, sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--sans);
+  background:var(--bg-deep);
+  color:var(--cream);
+  overflow-x:hidden;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important;}
+}
+
+/* ============================================================
+   MARCA D'ÁGUA
+   -------------------------------------------------------------
+   Logo fixa no fundo, bem discreta, atrás de todo o conteúdo.
+   Para ajustar a intensidade, mude só o "opacity" abaixo
+   (0.05 = quase invisível, 0.15 = mais visível).
+   Para trocar a imagem, troque o arquivo logo-fundo.jpeg mantendo
+   o mesmo nome, ou mude a URL aqui.
+============================================================ */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url('assets/logo-fundo.jpeg');
+  background-repeat:no-repeat;
+  background-position:center 40%;
+  background-size:min(720px, 90vw);
+  opacity:0.06;
+  filter:grayscale(15%);
+  z-index:0;
+  pointer-events:none;
+}
+
+/* ============================================================
+   MENU SUPERIOR (abas) - usado só na página inicial
+============================================================ */
+.topbar{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:78px;
+  background:#0d1b15;
+  border-bottom:1px solid rgba(207,159,77,0.18);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:56px;
+  z-index:1000;
+}
+/* .main e .page-content ficam por cima da marca d'água (z-index:0 no body::before) */
+.tab{
+  color:var(--muted);
+  font-family:var(--serif);
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:1px;
+  padding:8px 4px;
+  position:relative;
+  cursor:pointer;
+  background:none;
+  border:none;
+  transition:color .25s;
+}
+.tab:hover{color:var(--cream);}
+.tab.active{color:var(--gold-soft);}
+.tab.active::after{
+  content:'';
+  position:absolute;
+  width:100%;
+  height:2px;
+  background:var(--gold);
+  left:0;
+  bottom:-6px;
+  border-radius:2px;
+}
+
+/* ============================================================
+   BOTÃO VOLTAR FLUTUANTE - usado nas páginas secundárias
+   (a página secundária não tem barra própria: ela reaproveita
+   a mesma janela em arco da página inicial, para manter a
+   mesma "cara" em todo o site)
+============================================================ */
+.voltar-flutuante{
+  position:fixed;
+  top:18px;left:18px;
+  width:44px;height:44px;
+  border-radius:50%;
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.15);
+  color:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;
+  font-size:17px;
+  z-index:1000;
+  transition:background .2s, transform .2s;
+}
+.voltar-flutuante:hover{background:var(--panel-light); transform:translateX(-2px);}
+
+/* ============================================================
+   ÁREA PRINCIPAL / HERO - página inicial
+============================================================ */
+.main{
+  position:relative;
+  z-index:1;
+  margin-top:78px;
+  min-height:100vh;
+  padding:28px 20px 60px;
+  /* gradiente transparente: dá o brilho dourado no topo sem
+     tampar a marca d'água que está atrás (no body::before) */
+  background:radial-gradient(ellipse 700px 500px at 50% 0%, rgba(207,159,77,0.10), transparent 70%);
+}
+
+.top-icons{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:34px;
+}
+.left-icons{display:flex;gap:22px;}
+.top-icons a, .top-icons button{
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.15);
+  color:var(--cream);
+  width:44px;height:44px;
+  border-radius:50%;
+  font-size:18px;
+  cursor:pointer;
+  text-decoration:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s, background .2s;
+}
+.top-icons a:hover, .top-icons button:hover{transform:translateY(-2px);background:var(--panel-light);}
+
+/* --- Janela em arco: elemento-assinatura da página inicial --- */
+.arch-wrap{
+  display:flex;
+  justify-content:center;
+  margin-bottom:36px;
+}
+.arch{
+  position:relative;
+  width:min(320px, 78vw);
+  padding:46px 20px 32px;
+  text-align:center;
+  border:1px solid rgba(207,159,77,0.35);
+  border-bottom:none;
+  border-radius:160px 160px 12px 12px;
+  background:linear-gradient(180deg, rgba(207,159,77,0.08), rgba(15,32,25,0));
+}
+.arch::before{
+  content:'';
+  position:absolute;
+  top:22px;left:50%;
+  width:120px;height:120px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(232,201,135,0.55), rgba(232,201,135,0) 70%);
+  filter:blur(4px);
+  animation:glow 4s ease-in-out infinite;
+  z-index:0;
+}
+@keyframes glow{
+  0%,100%{opacity:.6; transform:translateX(-50%) scale(1);}
+  50%{opacity:1; transform:translateX(-50%) scale(1.08);}
+}
+.arch i.logo-icon{
+  position:relative;
+  z-index:1;
+  font-size:44px;
+  color:var(--gold-soft);
+}
+.arch h1{
+  position:relative;z-index:1;
+  font-family:var(--serif);
+  font-weight:700;
+  font-size:30px;
+  line-height:1.15;
+  margin-top:14px;
+  color:var(--cream);
+}
+.arch p{
+  position:relative;z-index:1;
+  font-family:var(--serif);
+  font-size:16px;
+  letter-spacing:4px;
+  color:var(--gold-soft);
+  margin-top:8px;
+}
+
+.verse{
+  max-width:480px;
+  margin:0 auto 44px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+  padding:0 12px;
+}
+.verse strong{color:var(--gold-soft); font-weight:600;}
+
+/* ============================================================
+   GRADE DE FUNCIONALIDADES - página inicial
+============================================================ */
+.grid{
+  max-width:720px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.item{
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.10);
+  border-radius:var(--radius);
+  text-align:center;
+  color:var(--cream);
+  cursor:pointer;
+  padding:22px 8px;
+  text-decoration:none;
+  display:block;
+  transition:transform .2s, background .2s, border-color .2s;
+}
+.item:hover{
+  transform:translateY(-4px);
+  background:var(--panel-light);
+  border-color:rgba(207,159,77,0.4);
+}
+.item i{
+  font-size:30px;
+  color:var(--gold-soft);
+  margin-bottom:10px;
+  display:block;
+}
+.item p{
+  font-size:13px;
+  line-height:1.3;
+  font-weight:500;
+}
+
+/* ============================================================
+   CONTEÚDO DE PÁGINA SECUNDÁRIA
+============================================================ */
+.page-content{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  padding:80px 20px 60px;
+  background:radial-gradient(ellipse 700px 500px at 50% 0%, rgba(207,159,77,0.08), transparent 70%);
+}
+.page-card{
+  max-width:560px;
+  margin:0 auto;
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.15);
+  border-radius:var(--radius);
+  padding:32px 26px;
+  text-align:center;
+}
+.page-card i.page-icon{
+  font-size:40px;
+  color:var(--gold-soft);
+  margin-bottom:18px;
+  display:block;
+}
+.page-card h2{
+  font-family:var(--serif);
+  font-size:26px;
+  margin-bottom:14px;
+  color:var(--cream);
+}
+.page-card p{
+  color:var(--muted);
+  line-height:1.7;
+  font-size:15px;
+}
+.page-card .em-breve{
+  display:inline-block;
+  margin-top:22px;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--gold-soft);
+  border:1px solid rgba(207,159,77,0.35);
+  padding:6px 14px;
+  border-radius:20px;
+}
+
+/* ============================================================
+   FOCO VISÍVEL / ACESSIBILIDADE
+============================================================ */
+a:focus-visible, button:focus-visible, .tab:focus-visible{
+  outline:2px solid var(--gold-soft);
+  outline-offset:2px;
+}
+
+/* ============================================================
+   FERRAMENTAS DE BUSCA (Bíblia e Novo Cântico)
+============================================================ */
+.tool-wrap{
+  max-width:640px;
+  margin:0 auto;
+}
+
+.tool-header{
+  text-align:center;
+  margin-bottom:22px;
+}
+.tool-header i{
+  font-size:34px;
+  color:var(--gold-soft);
+  margin-bottom:10px;
+  display:block;
+}
+.tool-header h1{
+  font-family:var(--serif);
+  font-size:26px;
+  color:var(--cream);
+}
+
+.version-toggle{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-bottom:18px;
+}
+.version-toggle button{
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.2);
+  color:var(--muted);
+  padding:8px 18px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.5px;
+  cursor:pointer;
+  transition:background .2s, color .2s, border-color .2s;
+}
+.version-toggle button.ativo{
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#1a1206;
+}
+
+.picker-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.picker-row select{
+  flex:1;
+  min-width:110px;
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.2);
+  color:var(--cream);
+  padding:12px 10px;
+  border-radius:12px;
+  font-size:14px;
+  font-family:var(--sans);
+}
+.picker-row select:focus{
+  outline:2px solid var(--gold-soft);
+}
+
+.search-box{
+  position:relative;
+  margin-bottom:18px;
+}
+.search-box i{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  font-size:14px;
+}
+.search-box input{
+  width:100%;
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.2);
+  color:var(--cream);
+  padding:13px 14px 13px 38px;
+  border-radius:12px;
+  font-size:14px;
+  font-family:var(--sans);
+}
+.search-box input::placeholder{ color:var(--muted); }
+.search-box input:focus{ outline:2px solid var(--gold-soft); }
+
+.result-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:420px;
+  overflow-y:auto;
+  padding-right:2px;
+}
+.result-list li{
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.08);
+  border-radius:12px;
+  padding:12px 14px;
+  cursor:pointer;
+  transition:background .2s, border-color .2s;
+}
+.result-list li:hover{
+  background:var(--panel-light);
+  border-color:rgba(207,159,77,0.35);
+}
+.result-list li .ref{
+  color:var(--gold-soft);
+  font-weight:700;
+  font-size:12.5px;
+  letter-spacing:.4px;
+  display:block;
+  margin-bottom:4px;
+}
+.result-list li .snippet{
+  color:var(--muted);
+  font-size:13.5px;
+  line-height:1.5;
+}
+.result-list li .snippet mark{
+  background:transparent;
+  color:var(--gold-soft);
+  font-weight:700;
+}
+.empty-msg{
+  text-align:center;
+  color:var(--muted);
+  font-size:13.5px;
+  padding:30px 10px;
+}
+
+/* Leitor de capítulo / letra de hino */
+.reader-box{
+  background:var(--panel);
+  border:1px solid rgba(207,159,77,0.15);
+  border-radius:var(--radius);
+  padding:24px 22px;
+  margin-top:6px;
+}
+.reader-box h2{
+  font-family:var(--serif);
+  font-size:22px;
+  color:var(--cream);
+  margin-bottom:4px;
+}
+.reader-box .subtitulo{
+  color:var(--gold-soft);
+  font-size:12.5px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+  display:block;
+}
+.reader-box p.verso{
+  color:var(--cream);
+  line-height:1.85;
+  font-size:15.5px;
+  margin-bottom:10px;
+}
+.reader-box p.verso .num{
+  color:var(--gold-soft);
+  font-weight:700;
+  font-size:12px;
+  margin-right:6px;
+  vertical-align:top;
+}
+.reader-box p.verso mark{
+  background:rgba(207,159,77,0.25);
+  color:var(--cream);
+  padding:0 2px;
+  border-radius:3px;
+}
+.reader-box .letra-hino{
+  color:var(--cream);
+  line-height:2;
+  font-size:15.5px;
+  white-space:pre-line;
+}
+
+.nav-caps{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:18px;
+}
+.nav-caps button{
+  flex:1;
+  background:var(--panel-light);
+  border:1px solid rgba(207,159,77,0.2);
+  color:var(--cream);
+  padding:11px;
+  border-radius:12px;
+  font-size:13.5px;
+  cursor:pointer;
+  transition:background .2s;
+}
+.nav-caps button:hover{ background:rgba(207,159,77,0.18); }
+.nav-caps button:disabled{ opacity:.4; cursor:default; }
+
+.voltar-lista{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:var(--gold-soft);
+  background:none;
+  border:none;
+  font-size:13.5px;
+  cursor:pointer;
+  margin-bottom:14px;
+  padding:0;
+}
+.voltar-lista:hover{ text-decoration:underline; }
+
+/* ============================================================
+   RESPONSIVO
+============================================================ */
+@media(max-width:420px){
+  .topbar{gap:34px;}
+  .tab{font-size:17px;}
+  .arch h1{font-size:24px;}
+  .grid{gap:10px;}
+  .item{padding:16px 6px;}
+  .item i{font-size:26px;}
+  .item p{font-size:11.5px;}
+  .page-card{padding:26px 18px;}
+}
