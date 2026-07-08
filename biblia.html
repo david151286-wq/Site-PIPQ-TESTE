@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bíblia Sagrada - PIPQ</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0f2019">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0f2019">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,131 +25,74 @@
         <h1>Bíblia Sagrada</h1>
       </div>
 
-      <!-- Aparece só se o carregamento automático (fetch) falhar,
-           por exemplo quando o arquivo é aberto direto do computador -->
-      <div class="carregador" id="carregadorBiblia" style="display:none;">
-        <p>Escolha o arquivo <strong>biblia-ara.json</strong> ou <strong>biblia-naa.json</strong> para começar a ler e pesquisar.</p>
-        <label class="botao-arquivo" for="arquivoBiblia">
-          <i class="fa-solid fa-folder-open"></i> Escolher arquivo .json
-        </label>
-        <input type="file" id="arquivoBiblia" accept="application/json,.json">
-        <span class="nome-arquivo" id="nomeArquivoBiblia"></span>
-        <span class="erro" id="erroArquivoBiblia"></span>
+      <div class="version-toggle" id="versionToggle">
+        <button data-versao="ARA" class="ativo">ARA</button>
+        <button data-versao="NAA">NAA</button>
+        <button data-versao="ACF">ACF</button>
       </div>
 
-      <div id="conteudoBiblia" style="display:none;">
-        <div class="version-toggle" id="versionToggle">
-          <button data-arquivo="biblia-ara.json" class="ativo">ARA</button>
-          <button data-arquivo="biblia-naa.json">NAA</button>
-          <button data-arquivo="biblia-acf.json">ACF</button>
-        </div>
-
-        <div class="picker-row">
-          <select id="selectLivro" aria-label="Livro"></select>
-          <select id="selectCapitulo" aria-label="Capítulo"></select>
-          <select id="selectVersiculo" aria-label="Ir para o versículo"></select>
-        </div>
-
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="buscaTexto" placeholder="Pesquisar palavra ou trecho neste arquivo...">
-        </div>
-
-        <ul class="result-list" id="listaResultados" style="display:none;"></ul>
-
-        <div class="reader-box" id="leitor">
-          <button class="voltar-lista" id="voltarBusca" style="display:none;" onclick="fecharResultados()">
-            <i class="fa-solid fa-arrow-left"></i> Voltar à pesquisa
-          </button>
-          <span class="subtitulo" id="tituloVersao">Versão carregada</span>
-          <h2 id="tituloCapitulo">Carregando...</h2>
-          <div id="versiculos"></div>
-          <div class="nav-caps">
-            <button id="btnCapAnterior"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
-            <button id="btnCapProximo">Próximo <i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-        </div>
+      <div class="picker-row">
+        <select id="selectLivro" aria-label="Livro"></select>
+        <select id="selectCapitulo" aria-label="Capítulo"></select>
+        <select id="selectVersiculo" aria-label="Ir para o versículo"></select>
       </div>
 
-      <!-- mensagem enquanto tenta carregar sozinho -->
-      <p class="empty-msg" id="carregandoMsg">Carregando a Bíblia...</p>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="buscaTexto" placeholder="Pesquisar palavra ou trecho...">
+      </div>
+
+      <ul class="result-list" id="listaResultados" style="display:none;"></ul>
+
+      <div class="reader-box" id="leitor">
+        <button class="voltar-lista" id="voltarBusca" style="display:none;" onclick="fecharResultados()">
+          <i class="fa-solid fa-arrow-left"></i> Voltar à pesquisa
+        </button>
+        <span class="subtitulo" id="tituloVersao">ARA</span>
+        <h2 id="tituloCapitulo">Carregando...</h2>
+        <div id="versiculos"></div>
+        <div class="nav-caps">
+          <button id="btnCapAnterior"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+          <button id="btnCapProximo">Próximo <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- ============================================================
+       DADOS DA BÍBLIA — embutidos direto neste arquivo (ARA, NAA
+       e ACF). Isso garante que o site funcione em qualquer
+       navegador, mesmo aberto direto do computador, sem depender
+       de buscar (fetch) outro arquivo à parte.
+       Para atualizar o texto de uma versão, gere este bloco de novo
+       a partir do .json correspondente (veja README no projeto).
+  ============================================================ -->
+  <script src="_dados_biblia.js"></script>
+
   <script>
     /* ============================================================
-       COMO FUNCIONA (leia se quiser mexer)
+       COMO FUNCIONA
        -------------------------------------------------------------
-       1) Ao abrir a página, ela tenta buscar sozinha o arquivo
-          "biblia-ara.json" que deve estar na MESMA PASTA deste
-          index.html (fetch). Isso só funciona se o site estiver
-          hospedado (ex: GitHub Pages) — em navegador aberto direto
-          do computador (file://), o fetch é bloqueado e aparece o
-          botão "Escolher arquivo" como alternativa manual.
-       2) O botão ARA/NAA troca de versão buscando o outro arquivo.
-       3) A pesquisa por texto varre todos os livros/capítulos/
-          versículos carregados e mostra até LIMITE_RESULTADOS itens.
+       window.BIBLIA_ARA / window.BIBLIA_NAA / window.BIBLIA_ACF já
+       chegam prontos (carregados pelo <script src> acima). O botão
+       de versão só troca qual dessas variáveis está sendo usada —
+       não faz nenhum pedido de rede.
     ============================================================ */
 
     const LIMITE_RESULTADOS = 60;
-    let dadosBiblia = null;
+    let versaoAtual = 'ARA';
     let livroAtualIndex = 0;
     let capituloAtualIndex = 0;
+
+    function dadosVersao(){
+      if (versaoAtual === 'NAA') return window.BIBLIA_NAA;
+      if (versaoAtual === 'ACF') return window.BIBLIA_ACF;
+      return window.BIBLIA_ARA;
+    }
 
     function escapeHtml(s){
       return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
     }
-
-    function ativarBiblia(json, nomeVersao){
-      dadosBiblia = json;
-      document.getElementById('carregandoMsg').style.display = 'none';
-      document.getElementById('carregadorBiblia').style.display = 'none';
-      document.getElementById('conteudoBiblia').style.display = 'block';
-      document.getElementById('tituloVersao').textContent = nomeVersao.toUpperCase();
-      livroAtualIndex = 0;
-      capituloAtualIndex = 0;
-      popularLivros(); popularCapitulos(); popularVersiculos();
-      mostrarCapitulo();
-    }
-
-    async function tentarCarregarAutomatico(arquivo){
-      try{
-        const resp = await fetch('./' + arquivo);
-        if (!resp.ok) throw new Error('http ' + resp.status);
-        const json = await resp.json();
-        if (!Array.isArray(json) || !json[0] || !json[0].chapters) throw new Error('formato inesperado');
-        ativarBiblia(json, arquivo.replace('.json',''));
-        return true;
-      } catch(err){
-        return false;
-      }
-    }
-
-    document.getElementById('arquivoBiblia').addEventListener('change', function(e){
-      const file = e.target.files[0];
-      const erroEl = document.getElementById('erroArquivoBiblia');
-      erroEl.style.display = 'none';
-      if (!file) return;
-      document.getElementById('nomeArquivoBiblia').textContent = 'Carregando ' + file.name + '...';
-
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        try{
-          const json = JSON.parse(ev.target.result);
-          if (!Array.isArray(json) || !json[0] || !json[0].chapters) throw new Error('formato inesperado');
-          ativarBiblia(json, file.name.replace('.json',''));
-        } catch(err){
-          erroEl.textContent = 'Não consegui ler esse arquivo. Confira se é um .json de Bíblia válido.';
-          erroEl.style.display = 'block';
-          document.getElementById('nomeArquivoBiblia').textContent = '';
-        }
-      };
-      reader.onerror = function(){
-        erroEl.textContent = 'Erro ao ler o arquivo.';
-        erroEl.style.display = 'block';
-      };
-      reader.readAsText(file, 'utf-8');
-    });
 
     const selectLivro = document.getElementById('selectLivro');
     const selectCapitulo = document.getElementById('selectCapitulo');
@@ -157,13 +100,14 @@
     const buscaTexto = document.getElementById('buscaTexto');
     const listaResultados = document.getElementById('listaResultados');
     const leitor = document.getElementById('leitor');
+    const tituloVersao = document.getElementById('tituloVersao');
     const tituloCapitulo = document.getElementById('tituloCapitulo');
     const versiculosDiv = document.getElementById('versiculos');
     const voltarBusca = document.getElementById('voltarBusca');
 
     function popularLivros(){
       selectLivro.innerHTML = '';
-      dadosBiblia.forEach((livro, i) => {
+      dadosVersao().forEach((livro, i) => {
         const opt = document.createElement('option');
         opt.value = i; opt.textContent = livro.name;
         selectLivro.appendChild(opt);
@@ -172,7 +116,7 @@
     }
 
     function popularCapitulos(){
-      const livro = dadosBiblia[livroAtualIndex];
+      const livro = dadosVersao()[livroAtualIndex];
       selectCapitulo.innerHTML = '';
       livro.chapters.forEach((cap, i) => {
         const opt = document.createElement('option');
@@ -183,7 +127,7 @@
     }
 
     function popularVersiculos(){
-      const livro = dadosBiblia[livroAtualIndex];
+      const livro = dadosVersao()[livroAtualIndex];
       const versiculos = livro.chapters[capituloAtualIndex];
       selectVersiculo.innerHTML = '';
       versiculos.forEach((v, i) => {
@@ -194,8 +138,9 @@
     }
 
     function mostrarCapitulo(scrollParaVersiculo){
-      const livro = dadosBiblia[livroAtualIndex];
+      const livro = dadosVersao()[livroAtualIndex];
       const versiculos = livro.chapters[capituloAtualIndex];
+      tituloVersao.textContent = versaoAtual;
       tituloCapitulo.textContent = livro.name + ' ' + (capituloAtualIndex + 1);
 
       versiculosDiv.innerHTML = '';
@@ -207,7 +152,7 @@
       });
 
       document.getElementById('btnCapAnterior').disabled = (livroAtualIndex === 0 && capituloAtualIndex === 0);
-      document.getElementById('btnCapProximo').disabled = (livroAtualIndex === dadosBiblia.length - 1 && capituloAtualIndex === livro.chapters.length - 1);
+      document.getElementById('btnCapProximo').disabled = (livroAtualIndex === dadosVersao().length - 1 && capituloAtualIndex === livro.chapters.length - 1);
 
       if (typeof scrollParaVersiculo === 'number'){
         const alvo = document.getElementById('v' + scrollParaVersiculo);
@@ -218,17 +163,17 @@
     }
 
     function irParaCapituloAnterior(){
-      const livro = dadosBiblia[livroAtualIndex];
+      const livro = dadosVersao()[livroAtualIndex];
       if (capituloAtualIndex > 0){ capituloAtualIndex--; }
-      else if (livroAtualIndex > 0){ livroAtualIndex--; capituloAtualIndex = dadosBiblia[livroAtualIndex].chapters.length - 1; }
+      else if (livroAtualIndex > 0){ livroAtualIndex--; capituloAtualIndex = dadosVersao()[livroAtualIndex].chapters.length - 1; }
       else { return; }
       popularLivros(); popularCapitulos(); popularVersiculos(); mostrarCapitulo();
     }
 
     function irParaCapituloProximo(){
-      const livro = dadosBiblia[livroAtualIndex];
+      const livro = dadosVersao()[livroAtualIndex];
       if (capituloAtualIndex < livro.chapters.length - 1){ capituloAtualIndex++; }
-      else if (livroAtualIndex < dadosBiblia.length - 1){ livroAtualIndex++; capituloAtualIndex = 0; }
+      else if (livroAtualIndex < dadosVersao().length - 1){ livroAtualIndex++; capituloAtualIndex = 0; }
       else { return; }
       popularLivros(); popularCapitulos(); popularVersiculos(); mostrarCapitulo();
     }
@@ -247,26 +192,26 @@
     document.getElementById('btnCapAnterior').addEventListener('click', irParaCapituloAnterior);
     document.getElementById('btnCapProximo').addEventListener('click', irParaCapituloProximo);
 
-    document.getElementById('versionToggle').addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-arquivo]');
+    document.getElementById('versionToggle').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-versao]');
       if (!btn) return;
       document.querySelectorAll('#versionToggle button').forEach(b => b.classList.remove('ativo'));
       btn.classList.add('ativo');
-      const ok = await tentarCarregarAutomatico(btn.dataset.arquivo);
-      if (!ok){
-        document.getElementById('conteudoBiblia').style.display = 'none';
-        document.getElementById('carregadorBiblia').style.display = 'block';
-        document.getElementById('carregadorBiblia').querySelector('p').innerHTML =
-          'Escolha o arquivo <strong>' + btn.dataset.arquivo + '</strong> para trocar de versão.';
-      }
+      versaoAtual = btn.dataset.versao;
+      livroAtualIndex = 0;
+      capituloAtualIndex = 0;
+      popularLivros(); popularCapitulos(); popularVersiculos();
+      mostrarCapitulo();
+      if (buscaTexto.value.trim()) executarBusca();
     });
 
     function executarBusca(){
       const termo = buscaTexto.value.trim().toLowerCase();
       if (!termo){ fecharResultados(); return; }
+      const livros = dadosVersao();
       const resultados = [];
-      for (let li = 0; li < dadosBiblia.length && resultados.length < LIMITE_RESULTADOS; li++){
-        const livro = dadosBiblia[li];
+      for (let li = 0; li < livros.length && resultados.length < LIMITE_RESULTADOS; li++){
+        const livro = livros[li];
         for (let ci = 0; ci < livro.chapters.length && resultados.length < LIMITE_RESULTADOS; ci++){
           const versiculos = livro.chapters[ci];
           for (let vi = 0; vi < versiculos.length && resultados.length < LIMITE_RESULTADOS; vi++){
@@ -317,19 +262,14 @@
       debounceBusca = setTimeout(executarBusca, 250);
     });
 
-    // ------- Inicialização: tenta carregar sozinho; se falhar, mostra o botão -------
-    (async () => {
-      const ok = await tentarCarregarAutomatico('biblia-ara.json');
-      if (!ok){
-        document.getElementById('carregandoMsg').style.display = 'none';
-        document.getElementById('carregadorBiblia').style.display = 'block';
-      }
-    })();
+    // ------- Inicialização (dados já estão em memória, sem espera) -------
+    popularLivros();
+    popularCapitulos();
+    popularVersiculos();
+    mostrarCapitulo();
   </script>
 
-
   <script>
-    // Registra o Service Worker para permitir instalar o app e usar offline
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => {
@@ -338,5 +278,6 @@
       });
     }
   </script>
+
 </body>
 </html>

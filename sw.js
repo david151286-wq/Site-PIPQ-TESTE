@@ -36,6 +36,8 @@ const CORE_ASSETS = [
   './biblia-naa.json',
   './biblia-acf.json',
   './novo-cantico.json',
+  './_dados_biblia.js',
+  './_dados_cantico.js',
   './assets/logo-fundo.jpeg',
   './icons/icon-192.png',
   './icons/icon-512.png'

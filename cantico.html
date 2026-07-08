@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novo Cântico - PIPQ</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0f2019">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0f2019">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,47 +25,28 @@
         <h1>Novo Cântico</h1>
       </div>
 
-      <!-- Aparece só se o carregamento automático (fetch) falhar -->
-      <div class="carregador" id="carregadorCantico" style="display:none;">
-        <p>Escolha o arquivo <strong>novo-cantico.json</strong> para ver e pesquisar os hinos.</p>
-        <label class="botao-arquivo" for="arquivoCantico">
-          <i class="fa-solid fa-folder-open"></i> Escolher arquivo .json
-        </label>
-        <input type="file" id="arquivoCantico" accept="application/json,.json">
-        <span class="nome-arquivo" id="nomeArquivoCantico"></span>
-        <span class="erro" id="erroArquivoCantico"></span>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="buscaHino" placeholder="Buscar por número, título ou trecho da letra...">
       </div>
 
-      <div id="conteudoCantico" style="display:none;">
-        <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="buscaHino" placeholder="Buscar por número, título ou trecho da letra...">
-        </div>
+      <ul class="result-list" id="listaHinos"></ul>
 
-        <ul class="result-list" id="listaHinos"></ul>
-
-        <div class="reader-box" id="leitorHino" style="display:none;">
-          <button class="voltar-lista" onclick="fecharHino()">
-            <i class="fa-solid fa-arrow-left"></i> Voltar à lista
-          </button>
-          <span class="subtitulo" id="numeroHino">Hino</span>
-          <h2 id="tituloHino"></h2>
-          <div class="letra-hino" id="letraHino"></div>
-        </div>
+      <div class="reader-box" id="leitorHino" style="display:none;">
+        <button class="voltar-lista" onclick="fecharHino()">
+          <i class="fa-solid fa-arrow-left"></i> Voltar à lista
+        </button>
+        <span class="subtitulo" id="numeroHino">Hino</span>
+        <h2 id="tituloHino"></h2>
+        <div class="letra-hino" id="letraHino"></div>
       </div>
-
-      <p class="empty-msg" id="carregandoMsg">Carregando o hinário...</p>
     </div>
   </div>
 
-  <script>
-    /* ============================================================
-       Mesma lógica da página da Bíblia: tenta buscar sozinho o
-       "novo-cantico.json" da mesma pasta (fetch); se não conseguir
-       (arquivo aberto direto do computador), mostra o botão manual.
-    ============================================================ */
+  <!-- Dados do hinário embutidos direto neste arquivo -->
+  <script src="_dados_cantico.js"></script>
 
-    let dadosCantico = null;
+  <script>
     const listaHinos = document.getElementById('listaHinos');
     const buscaHino = document.getElementById('buscaHino');
     const leitorHino = document.getElementById('leitorHino');
@@ -73,60 +54,11 @@
     function escapeHtml(s){
       return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
     }
-
-    function ativarCantico(json){
-      dadosCantico = json;
-      document.getElementById('carregandoMsg').style.display = 'none';
-      document.getElementById('carregadorCantico').style.display = 'none';
-      document.getElementById('conteudoCantico').style.display = 'block';
-      renderizarLista('');
-    }
-
-    async function tentarCarregarAutomatico(){
-      try{
-        const resp = await fetch('./novo-cantico.json');
-        if (!resp.ok) throw new Error('http ' + resp.status);
-        const json = await resp.json();
-        if (!Array.isArray(json) || !json[0] || !json[0].titulo) throw new Error('formato inesperado');
-        ativarCantico(json);
-        return true;
-      } catch(err){
-        return false;
-      }
-    }
-
-    document.getElementById('arquivoCantico').addEventListener('change', function(e){
-      const file = e.target.files[0];
-      const erroEl = document.getElementById('erroArquivoCantico');
-      erroEl.style.display = 'none';
-      if (!file) return;
-      document.getElementById('nomeArquivoCantico').textContent = 'Carregando ' + file.name + '...';
-
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        try{
-          const json = JSON.parse(ev.target.result);
-          if (!Array.isArray(json) || !json[0] || !json[0].titulo) throw new Error('formato inesperado');
-          ativarCantico(json);
-        } catch(err){
-          erroEl.textContent = 'Não consegui ler esse arquivo. Confira se é o .json do Novo Cântico.';
-          erroEl.style.display = 'block';
-          document.getElementById('nomeArquivoCantico').textContent = '';
-        }
-      };
-      reader.onerror = function(){
-        erroEl.textContent = 'Erro ao ler o arquivo.';
-        erroEl.style.display = 'block';
-      };
-      reader.readAsText(file, 'utf-8');
-    });
-
     function destacar(texto, termo){
       if (!termo) return escapeHtml(texto);
       const regex = new RegExp('(' + termo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
       return escapeHtml(texto).replace(regex, '<mark>$1</mark>');
     }
-
     function primeiraLinhaComTermo(letra, termo){
       const linhas = letra.split('\n');
       if (!termo) return linhas[0] || '';
@@ -138,7 +70,7 @@
       const termo = (termoOriginal || '').trim().toLowerCase();
       listaHinos.innerHTML = '';
 
-      const filtrados = dadosCantico.filter(h => {
+      const filtrados = window.NOVO_CANTICO.filter(h => {
         if (!termo) return true;
         return h.numero.toLowerCase().includes(termo) ||
                h.titulo.toLowerCase().includes(termo) ||
@@ -160,11 +92,11 @@
         listaHinos.appendChild(li);
       });
 
-      if (!termo && dadosCantico.length > 40){
+      if (!termo && window.NOVO_CANTICO.length > 40){
         const aviso = document.createElement('li');
         aviso.className = 'empty-msg';
         aviso.style.cursor = 'default';
-        aviso.textContent = 'Mostrando os primeiros 40 de ' + dadosCantico.length + ' hinos. Use a busca para encontrar outros.';
+        aviso.textContent = 'Mostrando os primeiros 40 de ' + window.NOVO_CANTICO.length + ' hinos. Use a busca para encontrar outros.';
         listaHinos.appendChild(aviso);
       }
     }
@@ -191,18 +123,10 @@
       debounceHino = setTimeout(() => renderizarLista(buscaHino.value), 200);
     });
 
-    (async () => {
-      const ok = await tentarCarregarAutomatico();
-      if (!ok){
-        document.getElementById('carregandoMsg').style.display = 'none';
-        document.getElementById('carregadorCantico').style.display = 'block';
-      }
-    })();
+    renderizarLista('');
   </script>
 
-
   <script>
-    // Registra o Service Worker para permitir instalar o app e usar offline
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => {
@@ -211,5 +135,6 @@
       });
     }
   </script>
+
 </body>
 </html>
